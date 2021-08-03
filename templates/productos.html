@@ -1,0 +1,49 @@
+{% extends 'basebs.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title%}
+	{{super()}} - PRODUCTOS
+{% endblock%}
+
+{% block content%}
+	
+<H1>PRODUCTOS</H1>
+	<form action={{url_for('productos')}} method='POST'>
+		CATEGORIA : <select name=categoria onclick="this.form.submit()">
+			{% for categoria in datacategoria%}
+				<option value="{{ categoria.0}}">{{categoria.1}}</option>
+			{% endfor%}
+		</select>
+
+	</form>
+	<table class="table table-dark table-striped">
+		<thead>
+			<tr>
+				<th scope='col'>ID</th>
+				<th scope='col'>TIPO</th>
+				<th scope='col'>NRO</th>
+				<th scope='col'>NOMBRE</th>
+				<th scope='col'>CELULAR</th>
+				<th scope='col'>EMAIL</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for d in dataproducto %}
+			<tr>
+				<th scope="row">{{ d.0}}</th>
+				<th>{{ d.1}}</th>
+				<th>{{ d.2}}</th>
+				<th>{{ d.3}}</th>
+				<th>{{ d.4}}</th>
+				<th>{{ d.5}}</th>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<div class="container">
+		{{ wtf.quick_form(frmProducto) }}
+	</div>
+
+
+	
+
+{% endblock%}

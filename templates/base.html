@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta charset="utf-8">
+		<title>
+            {% block title %}
+            SISTEMA POS
+            {% endblock%}
+        </title>
+        <link rel="stylesheet" href= " {{ url_for('static', filename='css/main.css')}} ">
+
+	</head>
+	<body>
+        <header>
+            <img src="{{ url_for('static',filename = 'images/logo.png') }}"/>
+            <a href="{{ url_for('index') }}">INICIO</a>
+        </header>
+       {% block content %}
+       {% endblock %}
+	</body>
+</html>
