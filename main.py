@@ -49,9 +49,9 @@ def index():
 
     if request.method == 'POST' :
         cargoId = request.form['cargo']
-        sqlProducto = "SELECT nombre,apellido,email,cargo FROM usuario where cargo like '%"+cargoId+"%'"
+        sqlProducto = "SELECT id,nombre,apellido,email,cargo FROM usuario where cargo like '%"+cargoId+"%'"
     else:
-        sqlProducto = "SELECT nombre,apellido,email,cargo FROM usuario"
+        sqlProducto = "SELECT id,nombre,apellido,email,cargo FROM usuario"
     
     cur2 = mysql.connection.cursor()
     cur2.execute(sqlProducto)
@@ -69,6 +69,16 @@ def index():
         'productos':lstProductos
     }"""
     return render_template('index.html',**context2)
+
+@app.route('/eliminar', methods=['POST'])
+def eliminar():
+    id = request.form['eid']
+    curEliminarProducto = mysql.connection.cursor()
+    curEliminarProducto.execute("DELETE FROM usuario WHERE id=%s",(id))
+    mysql.connection.commit()
+    curEliminarProducto.close()
+    
+    return redirect(url_for('index'))
 
 @app.route('/productos', methods=['GET','POST'])
 def productos():
