@@ -6,8 +6,11 @@ from flask_mysqldb import MySQL
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
 from wtforms.validators import DataRequired
+from flask import Blueprint
+
 
 app = Flask(__name__)
+mod = Blueprint('users', __name__)
 
 app.config['MYSQL_HOST']= 'localhost'
 app.config['MYSQL_USER']= 'root'
@@ -36,19 +39,30 @@ class frmProducto(FlaskForm):
 
 
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def index():
+    
     cur = mysql.connection.cursor()
-    cur.execute('select nombre,apellido,email,cargo from usuario')
+    cur.execute('SELECT nombre,apellido,email,cargo FROM usuario')
     data = cur.fetchall()
     cur.close()
 
+    if request.method == 'POST' :
+        cargoId = request.form['cargo']
+        sqlProducto = "SELECT nombre,apellido,email,cargo FROM usuario where cargo like '%"+cargoId+"%'"
+    else:
+        sqlProducto = "SELECT nombre,apellido,email,cargo FROM usuario"
+    
+    cur2 = mysql.connection.cursor()
+    cur2.execute(sqlProducto)
+    data = cur2.fetchall()
+    cur2.close()
+    
     print(data)
+    
     context2 ={
-        'data':data
-    }
-
- 
+        'data': data
+    }   
     """context = {
         'nombre':name,
         'user_ip':user_ip,
@@ -57,7 +71,6 @@ def index():
     return render_template('index.html',**context2)
 
 @app.route('/productos', methods=['GET','POST'])
-
 def productos():
     
     cur1 = mysql.connection.cursor()

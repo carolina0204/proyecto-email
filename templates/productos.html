@@ -8,10 +8,19 @@
 	
 <H1>PRODUCTOS</H1>
 	<form action={{url_for('productos')}} method='POST'>
-		CATEGORIA : <select name=categoria onclick="this.form.submit()">
+		<!-- CATEGORIA : <select name=categoria onclick="this.form.submit()">
 			{% for categoria in datacategoria%}
 				<option value="{{ categoria.0}}">{{categoria.1}}</option>
-			{% endfor%}
+			{% endfor%} -->
+			PRODUCTOS - CATEGORIA : <select name="categoria" onchange="this.form.submit()">
+				<option value=0>TODOS</option>
+				{% for categoria in dataCategoria %}
+					{% set miselected = '' %}
+					{% if(catId|int == categoria.0|int ) %}
+						{% set miselected = 'selected' %}
+					{% endif %}
+				<option value="{{ categoria.0 }}" {{miselected}} >{{ categoria.1 }}</option>
+				{% endfor %}
 		</select>
 
 	</form>

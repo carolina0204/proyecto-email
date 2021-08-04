@@ -4,11 +4,9 @@
         
 	<H1>CLIENTES</H1>
 	<form action={{url_for('index')}} method='POST'>
-		CATEGORIA : <select name=categoria onclick="this.form.submit()">
-			{% for categoria in datacategoria%}
-				<option value="{{ categoria.0}}">{{categoria.1}}</option>
-			{% endfor%}
-		</select>
+		FILTRO - CARGO : <input name="cargo"></input>
+			<button class="btn btn-primary" onsubmit="this.form.submit()">Filtrar</button>
+		
 
 	</form>
 	<table class="table table-dark table-striped">
