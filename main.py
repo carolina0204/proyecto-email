@@ -4,7 +4,7 @@ from flask import Flask
 from flask_mysqldb import MySQL
 
 from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField
+from wtforms import StringField,SubmitField,TextAreaField
 from wtforms.validators import DataRequired
 from flask import Blueprint
 
@@ -37,6 +37,11 @@ class frmProducto(FlaskForm):
     stock = StringField('Stock :' , validators=[DataRequired()])
     submit = SubmitField('Registrar Nuevo Producto')
 
+class frmEmail(FlaskForm):
+    to = StringField('To :' , validators=[DataRequired()])
+    subject = StringField('Subject :' , validators=[DataRequired()])
+    body = TextAreaField('Body :' , validators=[DataRequired()])
+    submit = SubmitField('Enviar email')
 
 
 @app.route('/', methods=['GET','POST'])
@@ -58,8 +63,6 @@ def index():
     data = cur2.fetchall()
     cur2.close()
     
-    print(data)
-    
     context2 ={
         'data': data
     }   
@@ -79,6 +82,37 @@ def eliminar():
     curEliminarProducto.close()
     
     return redirect(url_for('index'))
+
+@app.route('/email', methods=['GET','POST'])
+def email():
+    id = request.form['eid']
+    cur1 = mysql.connection.cursor()
+    cur1.execute('SELECT id,nombre,apellido,email,cargo FROM usuario WHERE id=%s',(id))
+    data = cur1.fetchall()
+    cur1.close()
+    
+    if request.method == 'POST' :
+        pass
+    else:
+        pass
+    
+    frmEmail1 = frmEmail()
+    
+    context ={
+        'data':data,
+        'id':id,
+        'frmEmail':frmEmail1
+    }
+    
+    if frmEmail1.validate_on_submit():
+        to = frmEmail1.email.data
+        subject = frmEmail1.nombre.data
+        body = frmEmail1.nombre.data
+        
+        return redirect(url_for('index'))
+            
+    return render_template('index.html',**context)
+
 
 @app.route('/productos', methods=['GET','POST'])
 def productos():
