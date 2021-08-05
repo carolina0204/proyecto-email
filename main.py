@@ -48,7 +48,7 @@ class frmEmail(FlaskForm):
 def index():
     
     cur = mysql.connection.cursor()
-    cur.execute('SELECT nombre,apellido,email,cargo FROM usuario')
+    cur.execute('SELECT nombre,apellido,email,cargo FROM usuario LIMIT 10')
     data = cur.fetchall()
     cur.close()
 
@@ -56,7 +56,7 @@ def index():
         cargoId = request.form['cargo']
         sqlProducto = "SELECT id,nombre,apellido,email,cargo FROM usuario where cargo like '%"+cargoId+"%'"
     else:
-        sqlProducto = "SELECT id,nombre,apellido,email,cargo FROM usuario"
+        sqlProducto = "SELECT id,nombre,apellido,email,cargo FROM usuario LIMIT 10"
     
     cur2 = mysql.connection.cursor()
     cur2.execute(sqlProducto)
@@ -86,43 +86,40 @@ def eliminar():
 @app.route('/email', methods=['GET','POST'])
 def email():
     
- 
-    '''     
-    id = request.form['eid']
-    cur1 = mysql.connection.cursor()
-    cur1.execute('SELECT id,nombre,apellido,email,cargo FROM usuario WHERE id=%s',(id))
-    data = cur1.fetchall()
-    cur1.close() '''
     
     if request.method == 'POST' :
         id = request.form['eid']
         print(id)
         '''    sqlEmail = ("SELECT * FROM usuario where id=''",(id)) '''
-        sqlEmail = ("SELECT id,nombre,apellido,email FROM usuario where id="+id)
+        sqlEmail = ("SELECT nombre,apellido,email FROM usuario where id="+id)
         print('ENTROOOOOOOOOOOOOOOO AQUIIIIIIIIIIIIIIIII')
     
-    cur2 = mysql.connection.cursor()
-    cur2.execute(sqlEmail)
-    data = cur2.fetchall()
-    cur2.close()
+    cursorEmail = mysql.connection.cursor()
+    cursorEmail.execute(sqlEmail)
+    data = cursorEmail.fetchone()
+    cursorEmail.close()
     
     
     frmEmail1 = frmEmail()
-    
+    frmEmail1.to.data = data[2]
+    frmEmail1.subject.data = "Envio de correo personal"
+    frmEmail1.body.data = "Hola sr@ "+ data[0] + " " + data[1] + "Somos una empresa de software"
+
     context ={
-        'data':data,
-        'id':id,
-        'frmEmail':frmEmail1
+        'frmemail':frmEmail1,
     }
     
-    if frmEmail1.validate_on_submit():
-        to = frmEmail1.email.data
-        subject = frmEmail1.nombre.data
-        body = frmEmail1.nombre.data
+    #if frmEmail1.validate_on_submit():
+
+    
+
+        #to = frmEmail1.email.data
+        #subject = frmEmail1.nombre.data
+        #body = frmEmail1.nombre.data
         
-        print(frmEmail1)
+    #print(frmEmail1)
         
-        return redirect(url_for('index'))
+    #return redirect(url_for('index'))
             
     return render_template('email.html',**context) 
 
