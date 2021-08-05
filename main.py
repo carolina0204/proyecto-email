@@ -85,16 +85,27 @@ def eliminar():
 
 @app.route('/email', methods=['GET','POST'])
 def email():
+    
+ 
+    '''     
     id = request.form['eid']
     cur1 = mysql.connection.cursor()
     cur1.execute('SELECT id,nombre,apellido,email,cargo FROM usuario WHERE id=%s',(id))
     data = cur1.fetchall()
-    cur1.close()
+    cur1.close() '''
     
     if request.method == 'POST' :
-        pass
-    else:
-        pass
+        id = request.form['eid']
+        print(id)
+        '''    sqlEmail = ("SELECT * FROM usuario where id=''",(id)) '''
+        sqlEmail = ("SELECT id,nombre,apellido,email FROM usuario where id="+id)
+        print('ENTROOOOOOOOOOOOOOOO AQUIIIIIIIIIIIIIIIII')
+    
+    cur2 = mysql.connection.cursor()
+    cur2.execute(sqlEmail)
+    data = cur2.fetchall()
+    cur2.close()
+    
     
     frmEmail1 = frmEmail()
     
@@ -109,9 +120,11 @@ def email():
         subject = frmEmail1.nombre.data
         body = frmEmail1.nombre.data
         
+        print(frmEmail1)
+        
         return redirect(url_for('index'))
             
-    return render_template('index.html',**context)
+    return render_template('email.html',**context) 
 
 
 @app.route('/productos', methods=['GET','POST'])

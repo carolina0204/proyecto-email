@@ -1,8 +1,4 @@
-{% extends 'basebs.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
-
-
-{% block content%}
+{% extends 'basebs.html' %} {% import 'bootstrap/wtf.html' as wtf %} {% block content%}
 
 <div class="container">
     <div class="row">
@@ -18,43 +14,42 @@
     <div class="row">
         <div class="col-12">
             <table class="table table-dark table-striped">
-                    <thead>
-                        <tr>
-                            <th scope='col'>NOMBRE</th>
-                            <th scope='col'>APELLIDO</th>
-                            <th scope='col'>EMAIL</th>
-                            <th scope='col'>CARGO</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for d in data %}
-                        <tr>
-                            <th scope="row">{{ d.1}}</th>
-                            <th>{{ d.2}}</th>
-                            <th>{{ d.3}}</th>
-                            <th>{{ d.4}}</th>
-                            <th>
-                                <div class="d-flex">
-                                    <form action="{{ url_for('eliminar') }}" method="POST">
-                                        <input type="hidden" name="eid" value="{{ d.0 }}" />
-                                        <input type="submit" value="ELIMINAR" class="btn btn-danger" />
-                                    </form>
-                                    <form action="{{ url_for('email') }}" method="POST" onchange="this.form.submit()">
-                                        <input type="hidden" name="eid" value="{{ d.0 }}" />
-                                        <input type="submit" value="ENV EMAIL" class="btn btn-success" />
-                                    </form>
-                                </div>
-                            </th>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <thead>
+                    <tr>
+                        <th scope='col'>NOMBRE</th>
+                        <th scope='col'>APELLIDO</th>
+                        <th scope='col'>EMAIL</th>
+                        <th scope='col'>CARGO</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in data %}
+                    <tr>
+                        <th scope="row">{{ d.1}}</th>
+                        <th>{{ d.2}}</th>
+                        <th>{{ d.3}}</th>
+                        <th>{{ d.4}}</th>
+                        <th>
+                            <div class="d-flex">
+                                <form action="{{ url_for('eliminar') }}" method="POST">
+                                    <input type="hidden" name="eid" value="{{ d.0 }}" />
+                                    <input type="submit" value="ELIMINAR" class="btn btn-danger" />
+                                </form>
+                                <form action="{{ url_for('email') }}" method="POST">
+                                    <input type="hidden" name="eid" value="{{ d.0 }}" />
+                                    <input type="submit" value="ENV EMAIL" class="btn btn-success" />
+                                </form>
+                            </div>
+                        </th>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
 
 </div>
-     
-{% endblock %}
 
+{% endblock %}
