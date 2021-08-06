@@ -1,3 +1,8 @@
+import smtplib
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from flask import Flask,render_template,request,redirect,url_for
 from flask_bootstrap import Bootstrap
 from flask import Flask
@@ -7,7 +12,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField,TextAreaField
 from wtforms.validators import DataRequired
 from flask import Blueprint
-
 
 app = Flask(__name__)
 mod = Blueprint('users', __name__)
@@ -22,27 +26,37 @@ app.secret_key = "mysecretkey"
 
 Bootstrap(app)
 
-lstProductos=['LAPTOP','MONITOR','MONITORES']
-
-class frmProducto(FlaskForm):
-    categoria = StringField('categoria :' , validators=[DataRequired()])
-    nombre = StringField('Nombre :' , validators=[DataRequired()])
-    marca = StringField('Marca :' , validators=[DataRequired()])
-    modelo = StringField('Modelo :' , validators=[DataRequired()])
-    serie = StringField('Nro Serie :' , validators=[DataRequired()])
-    ram = StringField('Memoria RAM :' , validators=[DataRequired()])
-    procesador = StringField('Procesador :' , validators=[DataRequired()])
-    discoduro = StringField('Disco Duro :' , validators=[DataRequired()])
-    precio = StringField('Precio :' , validators=[DataRequired()])
-    stock = StringField('Stock :' , validators=[DataRequired()])
-    submit = SubmitField('Registrar Nuevo Producto')
-
 class frmEmail(FlaskForm):
     to = StringField('To :' , validators=[DataRequired()])
     subject = StringField('Subject :' , validators=[DataRequired()])
     body = TextAreaField('Body :' , validators=[DataRequired()])
     submit = SubmitField('Enviar email')
 
+def enviar_correo(to,subject,body):
+    mail_content = body
+    #The mail addresses and password
+    sender_address = 'binareon.developer@gmail.com'
+    sender_pass = '&JJdymr$L5yg'
+    receiver_address = to
+    #Setup the MIME
+    message = MIMEMultipart()
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = subject   #The subject line
+    #The body and the attachments for the mail
+    message.attach(MIMEText(mail_content, 'plain'))
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.ehlo()
+    session.starttls() #enable security
+    session.ehlo()
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+    print('Mail Sentdfdsffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
+    return redirect(url_for('email'))
 
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -66,11 +80,6 @@ def index():
     context2 ={
         'data': data
     }   
-    """context = {
-        'nombre':name,
-        'user_ip':user_ip,
-        'productos':lstProductos
-    }"""
     return render_template('index.html',**context2)
 
 @app.route('/eliminar', methods=['POST'])
@@ -86,86 +95,28 @@ def eliminar():
 @app.route('/email', methods=['GET','POST'])
 def email():
     
-    
-    if request.method == 'POST' :
-        id = request.form['eid']
-        print(id)
-        '''    sqlEmail = ("SELECT * FROM usuario where id=''",(id)) '''
-        sqlEmail = ("SELECT nombre,apellido,email FROM usuario where id="+id)
-        print('ENTROOOOOOOOOOOOOOOO AQUIIIIIIIIIIIIIIIII')
-    
-    cursorEmail = mysql.connection.cursor()
-    cursorEmail.execute(sqlEmail)
-    data = cursorEmail.fetchone()
-    cursorEmail.close()
-    
-    
     frmEmail1 = frmEmail()
-    frmEmail1.to.data = data[2]
-    frmEmail1.subject.data = "Envio de correo personal"
-    frmEmail1.body.data = "Hola sr@ "+ data[0] + " " + data[1] + "Somos una empresa de software"
-
-    context ={
-        'frmemail':frmEmail1,
-    }
     
-    #if frmEmail1.validate_on_submit():
-
-    
-
-        #to = frmEmail1.email.data
-        #subject = frmEmail1.nombre.data
-        #body = frmEmail1.nombre.data
-        
-    #print(frmEmail1)
-        
-    #return redirect(url_for('index'))
-            
-    return render_template('email.html',**context) 
-
-
-@app.route('/productos', methods=['GET','POST'])
-def productos():
-    
-    cur1 = mysql.connection.cursor()
-    cur1.execute('select * from cat_producto')
-    datacategoria = cur1.fetchall()
-    cur1.close()
-
-    if request.method == 'POST' :
-        catId = request.form['categoria']
-        sqlProducto = "SELECT * FROM producto where cat_producto_id="+catId
+    if frmEmail1.validate_on_submit():
+        enviar_correo(frmEmail1.to.data,frmEmail1.subject.data,frmEmail1.body.data)
     else:
-        sqlProducto = "SELECT * FROM producto"
+        if request.method == 'POST':
+            id = request.form['eid']
+            print(id)
+            sqlEmail = ("SELECT nombre,apellido,email FROM usuario where id="+id)
+        
+        cursorEmail = mysql.connection.cursor()
+        cursorEmail.execute(sqlEmail)
+        data = cursorEmail.fetchone()
+        cursorEmail.close()
+        
+        frmEmail1.to.data = data[2]
+        frmEmail1.subject.data = "Envio de correo personal"
+        frmEmail1.body.data = "Hola sr@ "+ data[0] + " " + data[1] + "Somos una empresa de software"
 
-    cur2 = mysql.connection.cursor()
-    cur2.execute(sqlProducto)
-    dataproducto = cur2.fetchall()
-    cur2.close()
-
-    frmNuevoProducto = frmProducto()
-    
-    context2 ={
-        'datacategoria':datacategoria,
-        'dataproducto':dataproducto,
-        'frmProducto':frmNuevoProducto
-    }
-
-    if frmNuevoProducto.validate_on_submit():
-        categoria1 = frmNuevoProducto.categoria.data
-        nombre = frmNuevoProducto.nombre.data
-        marca = frmNuevoProducto.marca.data
-        modelo = frmNuevoProducto.modelo.data
-        serie = frmNuevoProducto.serie.data
-        ram = frmNuevoProducto.ram.data
-        procesador = frmNuevoProducto.procesador.data
-        discoduro = frmNuevoProducto.discoduro.data
-        precio = frmNuevoProducto.precio.data
-        stock = frmNuevoProducto.stock.data
-
-        cursornuevoproducto = mysql.connection.cursor()
-        cursornuevoproducto.execute("INSERT INTO PRODUCTO(cat_producto_id,nombre,marca,modelo,nro_serie,mem_ram,procesador,disco_duro,precio,stock) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(categoria1,nombre,marca,modelo,serie,ram,procesador,discoduro,precio,stock))
-        mysql.connection.commit()
+    context ={'frmEmail':frmEmail1}
+       
+    return render_template('email.html',**context) 
 
 if __name__ == '__main__':
     app.run(debug=True,port=5000)
